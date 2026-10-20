@@ -21,8 +21,8 @@ class book_check:
         if lst1 != [] :
 
             for val in lst1:
-                if self.name == val["name"] :
-                    return f"{self.name} is available, amount is {val["amt"]}"
+                if self.name == val["name"] and val["amt"] != 0:
+                    return f"{self.name} is available, amount is {val['amt']}, price is {val['price']}"
                 else:
                     continue
             else:
@@ -32,9 +32,10 @@ class book_check:
         
 
 class book_add:
-    def __init__(self,name,amount):
+    def __init__(self,name,amount,price):
         self.name = name 
         self.amount = amount
+        self.price = price
     def add(self):
         self.dit = {}
         if lst1 != [] :
@@ -42,14 +43,18 @@ class book_add:
                 if val["name"] == self.name :
                     val["name"] = self.name
                     val["amt"] += self.amount
+                    val["price"] = self.price
                     return f"book added"
             else:
                 self.dit["name"] = self.name
                 self.dit["amt"] = self.amount
+                self.dit["price"] = self.price
                 lst1.append(self.dit)
+                return f"new book {self.name} was added"
         else:
             self.dit["name"] = self.name
             self.dit["amt"] = self.amount
+            self.dit["price"] = self.price
             lst1.append(self.dit)
             return f"new book {self.name} was added"
 
@@ -60,30 +65,42 @@ class book_borrow:
     def borrow(self):
         if lst1 != [] :
             for val in lst1:
-                if self.name == val["name"] and self.amount == 1 and val["amt"] == 1:
-                    lst1.remove(val)
-                    return f"You borrowed{self.name} and amount = {self.amount}"
+                if self.amount <= 0 and self.name == val["name"] :
+                    return f"You can't enter zero or negative amount!"
                 elif self.name == val["name"] and self.amount == val["amt"] :
-                    lst1.remove(val)
-                    return f"You borrowed{self.name} and amount = {self.amount}"
-                elif self.name == val["name"] and self.amount < val["amt"] :
                     val["amt"] -= self.amount
-                    return f"You borrowed{self.name} and amount = {self.amount}"
+                    return f"You borrowed{self.name} and amount = {self.amount} and price = {val['price']*self.amount}"
+                elif self.name == val["name"] and self.amount < val["amt"] and self.amount > 0:
+                    val["amt"] -= self.amount
+                    return f"You borrowed{self.name} and amount = {self.amount} and price = {val['price']*self.amount}"
                 elif self.name == val["name"] and self.amount > val["amt"] :
-                    return f"The amount of books you want to borrow is more than we have right now, we have only {val["amt"]} books."
+                    return f"The amount of books you want to borrow is more than we have right now, we have only {val['amt']} books."
                 else:
                     continue
             else:
                 return f"Book not available"
         else:
             return f"Book not available"
+
+class book_remove:
+    def __init__(self,name):
+        self.name = name
+    def remove(self):
+        for val in lst1:
+            if self.name == val["name"] :
+                lst1.remove(val)
+                return f"The book {self.name} was removed"
+        else:
+            return f"{self.name} wasn't found!"
+
+
 class member_check:
     def __init__(self,name):
         self.name = name
     def show_members(self):
         for val in lst2:
             if self.name == val["name"] :
-                return f"name = {val["name"]}, salary = {val["salary"]} working hours = {val["working_hour"]}"
+                return f"name = {val['name']}, salary = {val['salary']} working hours = {val['working_hour']}"
         else:
             return f"Member not found!"
 
@@ -142,8 +159,8 @@ elif ans_2 =="none" :
     print("No checking of books or members\n")
 
 
-#adding the books or borrowing the books
-ans1 = input("DO you want to add books or borrow or none?(add/borrow/none)")
+#adding the books or borrowing the books or removing
+ans1 = input("DO you want to add books or borrow or remove or none?(add/borrow/remove/none)")
 ans_first = ans1.lower()
 if ans_first == "add" :
     ans_one = "y"
@@ -151,8 +168,9 @@ if ans_first == "add" :
         in1 = input("Which book you want to enter?")
         in11 = in1.lower()
         in2 = int(input("How many books you want to enter?"))
-        b_add = book_add(in11,in2)
-        b_add.add()
+        in22 = int(input("What is the price of the book?"))
+        b_add = book_add(in11,in2,in22)
+        print(b_add.add())
         anso = input("DO you want to enter the book again?(y/n)")
         ans_one = anso.lower()
 elif ans_first == "borrow" :
@@ -165,6 +183,16 @@ elif ans_first == "borrow" :
         print(b_borrow.borrow())
         ans3 = input("Do you want to borrow the any other books?(y/n)")
         ans_3 = ans3.lower()
+elif ans_first == "remove" :
+    ans_r = "y"
+    while ans_r == "y" :
+        ans_r1 = input("which book do you want to remove?")
+        ans_r2 = ans_r1.lower()
+        b_remove = book_remove(ans_r2)
+        print(b_remove.remove())
+        ans_r3 = input("Do you want to remove the book again?(y/n)")
+        ans_r = ans_r3.lower()
+
 elif ans_first == "none" :
     print("Neither added nor borrowed")
 
@@ -180,7 +208,7 @@ if ans_5 == "add" :
         ans_fifth2 = int(input("Enter the members monthly salary"))
         ans_fifth3 = int(input("Enter the members working hours"))
         m_add = member_add(ans_five,ans_fifth2,ans_fifth3)
-        print(member_add.add())
+        print(m_add.add())
         ans555 = input("Do you want to add the new member again?(y/n)")
         ans_55 = ans555.lower()
 elif ans_5 == "remove" :
@@ -198,3 +226,18 @@ elif ans_5 == "remove" :
 with open("storage_file.txt","w") as f:
     f.write(str(lst1)+"\n")
     f.write(str(lst2))
+
+#display of books and members
+with open("output_file.txt","w") as f:
+    f.write("BOOKS"+"\n")
+    f.write(f"{'NAME':<40}{'AMOUNT':<25}{'PRICE':<25}"+"\n")
+    if lst1 != [] :
+        for val in lst1 :
+            f.write(f"{val["name"]:<40}{val["amt"]:<25}{val["price"]:<25}"+"\n")
+    f.write("\n")
+    f.write("\n")
+    f.write(f"{"MEMBERS"}"+"\n")
+    f.write(f"{'NAME':<40}{'SALARY':<25}{'WORKING HOURS':<25}"+"\n")
+    if lst2 != [] :
+        for val in lst2:
+            f.write(f"{val["name"]:<40}{val["salary"]:<25}{val["working_hour"]:<25}"+"\n")

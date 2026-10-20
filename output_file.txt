@@ -1,0 +1,17 @@
+BOOKS
+NAME                                    AMOUNT                   PRICE                    
+psychology of money                     20                       1400                     
+48 laws of power                        20                       5000                     
+human nature                            24                       4500                     
+lean startup                            20                       4500                     
+game of thrones                         50                       6000                     
+
+
+MEMBERS
+NAME                                    SALARY                   WORKING HOURS            
+shyam                                   60000                    8                        
+sita                                    50000                    7                        
+gita                                    70000                    9                        
+hari                                    60000                    5                        
+krishna                                 90000                    8                        
+manish                                  60000                    8                        
